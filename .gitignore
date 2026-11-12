@@ -1,0 +1,13 @@
+node_modules/
+.test-build/
+test-results/
+*.zip
+release/
+.DS_Store
+.env
+.env.*
+*.pem
+*.key
+docs/*.txt
+docs/screenshots/live-*.png
+docs/screenshots/settings.png

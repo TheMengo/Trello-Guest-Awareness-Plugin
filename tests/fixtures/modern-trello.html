@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Modern Trello DOM regression fixture</title>
+<style>
+:root{font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172b4d;background:#e9f2ff}*{box-sizing:border-box}body{margin:0}header{padding:12px 20px;background:#0747a6;color:white;display:flex;gap:12px;align-items:center}h1{font-size:18px;margin:0}main{padding:24px}.controls{display:flex;gap:8px}#overlay-contents{max-width:740px;margin:20px auto;padding:24px;border-radius:12px;background:#fff;box-shadow:0 8px 40px #091e4230}button{font:inherit;padding:8px 12px;border:1px solid #8590a2;border-radius:4px;cursor:pointer}button:disabled{opacity:.5;cursor:default}button:focus-visible,[contenteditable]:focus-visible{outline:3px solid #0c66e4;outline-offset:3px}#ak-editor-textarea{min-height:100px;padding:12px;margin:12px 0;border:1px solid #8590a2;white-space:pre-wrap}.activities{margin:24px 0;padding:0;list-style:none}[data-testid=comment-container]{padding:8px;border-bottom:1px solid #dcdfe4}[data-mention-id]{background:#e9f2ff;color:#0055cc}h2{font-size:22px;margin-top:0}.description{border:1px solid transparent;padding:4px}
+</style></head><body>
+<header data-testid="board-header"><h1>Test board</h1></header>
+<main><nav class="controls" aria-label="Test card navigation"><button id="open-first">Open card</button><button id="open-second">Next card</button><button id="close-card">Close card</button></nav>
+<!-- The live page has this unrelated hidden legacy dialog as well as its modern card. -->
+<div class="window" role="dialog" aria-modal="true" hidden></div><div id="card-mount"></div></main>
+<script>
+// Sanitized structural reproduction of the current live card DOM. Native handlers
+// post only to this in-memory fixture; no Trello request or external side effect.
+window.fixture={submissions:0,comments:[],card:'CaRd1234',board:'AbCd1234',keyboardEvents:0,history:[]};
+const cardMarkup=()=>`<section id="overlay-contents" role="dialog" aria-modal="true" aria-labelledby="card-back-name" data-testid="card-back-name"><section data-testid="card-back-header"><h2 id="card-back-name">Test Guest Card</h2></section><div class="description" contenteditable="true" aria-label="Description">Description editor is unrelated</div><section data-testid="card-back-panel"><h3>Comments and activity</h3><div id="composer-mount"><button type="button" data-testid="card-back-new-comment-input-skeleton">Write a comment…</button></div><ul class="activities" aria-label="Previous comments"><li data-testid="card-back-action"><div data-testid="comment-container" id="fixture-history"></div></li></ul><div id="posted-comments"></div></section></section>`;
+function openComposer(){
+ const mount=document.querySelector('#composer-mount');
+ mount.innerHTML=`<div data-testid="card-back-comment-editor-container"><div data-testid="editor-content-container"><div id="ak-editor-textarea" class="ProseMirror" contenteditable="true" role="textbox" aria-label="Write a comment…"></div></div></div><button type="button" data-testid="card-back-comment-save-button" disabled>Save</button>`;
+ const editor=mount.querySelector('#ak-editor-textarea'), save=mount.querySelector('button');
+ editor.addEventListener('input',()=>{save.disabled=!editor.innerText.trim()});
+ editor.addEventListener('keydown',event=>{window.fixture.keyboardEvents++;if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();if(editor.innerText.trim())save.click()}});
+ save.addEventListener('click',()=>{const draft=editor.innerText;if(!draft.trim())return;window.fixture.submissions++;window.fixture.comments.push({text:draft,card:window.fixture.card});const p=document.createElement('p');p.textContent=draft;document.querySelector('#posted-comments').append(p);editor.replaceChildren();editor.dispatchEvent(new Event('input',{bubbles:true}));});
+ editor.focus();
+}
+function renderHistory(){
+ const mount=document.querySelector('#fixture-history');if(!mount)return;mount.replaceChildren();
+ for(const item of window.fixture.history){
+  const p=document.createElement('p');
+  if(item.kind==='resolved'||item.kind==='code-chip'||item.kind==='inconsistent'){
+   const parent=document.createElement('span');parent.dataset.mentionId=item.username;parent.dataset.ssrPlaceholder='mention-'+item.username;
+   const child=document.createElement('span');child.dataset.testid='mention-'+(item.kind==='inconsistent'?'unrelated':item.username);child.dataset.mentionType='2';child.dataset.mentionTooltip='false';child.textContent='@'+item.username;parent.append(child);
+   if(item.kind==='code-chip'){const code=document.createElement('code');code.append(parent);p.append(code)}else p.append(parent);
+  }else if(item.kind==='url'){const a=document.createElement('a');a.href='https://example.invalid/@'+item.username;a.textContent='@'+item.username;p.append(a)}
+  else if(item.kind==='code'){const code=document.createElement('code');code.textContent='@'+item.username;p.append(code)}
+  else p.textContent=item.text??'@'+item.username;
+  mount.append(p);
+ }
+}
+window.fixture.setHistory=items=>{window.fixture.history=items;renderHistory()};
+function render(){document.querySelector('#card-mount').innerHTML=window.fixture.card?cardMarkup():'';if(!window.fixture.card)return;document.querySelector('[data-testid="card-back-new-comment-input-skeleton"]').addEventListener('click',openComposer);renderHistory()}
+function navigate(card){window.fixture.card=card;window.fixture.history=[];history.pushState({},'',card?'/c/'+card+'/test-card':'/b/AbCd1234/test-board');render()}
+window.fixture.navigate=navigate;
+document.querySelector('#open-first').onclick=()=>navigate('CaRd1234');document.querySelector('#open-second').onclick=()=>navigate('CaRd5678');document.querySelector('#close-card').onclick=()=>navigate(null);
+render();
+</script></body></html>

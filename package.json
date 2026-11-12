@@ -1,0 +1,22 @@
+{
+  "name": "trello-guest-awareness",
+  "version": "1.0.3",
+  "private": true,
+  "description": "Read-only Workspace guest awareness for Trello",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "node scripts/test-unit.mjs",
+    "test:browser": "node --test --test-concurrency=1 tests/browser.test.mjs",
+    "test": "npm run typecheck && npm run test:unit && npm run build && npm run test:browser",
+    "package": "npm run build && node scripts/package.mjs"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.1.12",
+    "@types/node": "26.1.1",
+    "esbuild": "0.25.12",
+    "playwright": "1.55.1",
+    "typescript": "5.9.3"
+  }
+}

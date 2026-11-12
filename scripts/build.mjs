@@ -1,0 +1,10 @@
+import {build} from 'esbuild';
+import {mkdir, rm, cp, writeFile, readFile} from 'node:fs/promises';
+await rm('dist', {recursive:true,force:true});
+await mkdir('dist', {recursive:true});
+await cp('public','dist',{recursive:true});
+await build({entryPoints:['src/content.ts','src/background.ts','src/options.ts'],outdir:'dist',bundle:true,format:'iife',target:'chrome120',legalComments:'none',minify:false});
+const {version}=JSON.parse(await readFile('package.json','utf8'));
+const manifest={manifest_version:3,minimum_chrome_version:'120',name:'Trello Guest Awareness',version,description:'Understand Workspace guest access and notification signals before commenting on Trello.',permissions:['storage'],host_permissions:['https://api.trello.com/*'],background:{service_worker:'background.js'},content_scripts:[{matches:['https://trello.com/*'],js:['content.js'],run_at:'document_idle'}],options_ui:{page:'options.html',open_in_tab:true},action:{default_title:'Trello Guest Awareness — Settings'},content_security_policy:{extension_pages:"script-src 'self'; object-src 'none'; base-uri 'none'"}};
+await writeFile('dist/manifest.json', JSON.stringify(manifest,null,2)+'\n');
+console.log('Built dist/ — unpacked Manifest V3 extension');

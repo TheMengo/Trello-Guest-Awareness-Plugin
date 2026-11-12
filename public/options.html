@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>Trello Guest Awareness · Settings</title>
+    <link rel="stylesheet" href="options.css">
+    <script type="module" src="options.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">TRELLO GUEST AWARENESS</p>
+        <h1>Know who has access.</h1>
+        <p class="lede">A small reminder before you comment on a board with Workspace guests.</p>
+      </header>
+      <div id="status" role="status" aria-live="polite"></div>
+      <section aria-labelledby="awareness-heading">
+        <div class="section-title"><span class="step" aria-hidden="true">01</span><h2 id="awareness-heading">Awareness</h2></div>
+        <label class="toggle"><input id="enabled" type="checkbox" checked><span>Enable guest indicators and comment confirmations</span></label>
+        <p class="hint">A guest is a board member who is not a member of that board’s Trello Workspace. This does not establish whether someone works for your company.</p>
+      </section>
+      <section aria-labelledby="access-heading">
+        <div class="section-title"><span class="step" aria-hidden="true">02</span><h2 id="access-heading">Read-only Trello access</h2></div>
+        <p>The extension needs your authorization to compare board and Workspace membership. Until access is verified, Trello shows “Unable to verify guest status.”</p>
+        <ol class="setup">
+          <li>Create or obtain your organization’s Trello API key using <a href="https://trello.com/power-ups/admin" target="_blank" rel="noopener noreferrer">Trello’s developer portal</a>. No API secret is needed.</li>
+          <li>Enter the key below, choose a token expiration, then open the read-only authorization page. Review Trello’s permission screen and copy the token it provides.</li>
+          <li>Paste the token, then save and verify access. Each person must authorize their own token; never share tokens.</li>
+        </ol>
+        <form id="credentials-form">
+          <label for="api-key">API key</label>
+          <input id="api-key" name="apiKey" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" required maxlength="128" aria-describedby="key-help">
+          <p id="key-help" class="hint">Your own Trello API key. Credentials stay in this browser’s extension storage.</p>
+          <label for="authorization-expiration">Authorization token expiration</label>
+          <select id="authorization-expiration" name="authorizationExpiration" aria-describedby="expiration-help expiration-existing" disabled>
+            <option value="1hour">1 hour</option>
+            <option value="1day">1 day</option>
+            <option value="30days">30 days</option>
+            <option value="never" selected>Never expires</option>
+          </select>
+          <p id="expiration-help" class="hint">Choose how long Trello can authorize this extension. You can revoke access at any time through your Trello account settings.</p>
+          <p id="expiration-existing" class="hint">This choice is saved automatically and applies only to newly issued tokens. Existing tokens retain their original expiration. “Never expires” means no scheduled expiration; the token can still be revoked or invalidated.</p>
+          <button id="authorize" type="button" class="secondary" disabled>Open read-only authorization</button>
+          <label for="api-token" class="token-label">Authorization token</label>
+          <input id="api-token" name="token" type="password" autocomplete="off" spellcheck="false" maxlength="512" aria-describedby="token-help">
+          <p id="token-help" class="hint">Paste the token from Trello. Leave blank to keep a saved token. It is never exposed to a Trello page.</p>
+          <p id="connection-state" class="connection">No authorization saved.</p>
+          <div class="actions"><button id="save" type="submit">Save &amp; verify</button><button id="disconnect" type="button" class="secondary">Remove saved credentials</button></div>
+        </form>
+        <p class="hint">Removing credentials here does not revoke the token at Trello. You can revoke it in <a href="https://trello.com/my/account" target="_blank" rel="noopener noreferrer">your Trello account settings</a>.</p>
+      </section>
+      <section aria-labelledby="dismissals-heading">
+        <div class="section-title"><span class="step" aria-hidden="true">03</span><h2 id="dismissals-heading">Comment confirmations</h2></div>
+        <p>Board and card dismissals are independent. Guest membership or relevant card signals changing brings the confirmation back. The small board indicator stays visible.</p>
+        <div id="dismissals"></div>
+        <button id="restore-all" type="button" class="secondary">Restore all dismissed warnings</button>
+      </section>
+      <footer><strong>Awareness, without monitoring.</strong> Comment text is inspected transiently in the page to identify mentions. It is never saved or transmitted by this extension. No analytics, permissions changes, or comment posting API.</footer>
+    </main>
+  </body>
+</html>

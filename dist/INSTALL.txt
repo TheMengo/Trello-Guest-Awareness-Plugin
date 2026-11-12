@@ -1,0 +1,39 @@
+Trello Guest Awareness 1.0.3 — unpacked installation
+
+1. Extract this folder to a permanent location.
+2. Open chrome://extensions (or edge://extensions).
+3. Enable Developer mode, click Load unpacked, and select this folder.
+4. Click the extension toolbar icon to open Settings.
+5. Enter a Trello developer API key. Choose Authorization token expiration:
+   1 hour, 1 day, 30 days, or Never expires (default). The choice saves
+   automatically. Then choose Open read-only authorization.
+6. Approve the requested read-only access at Trello, copy the token, paste it
+   into Settings, then choose Save & verify. No API secret is required.
+7. Reload Trello tabs after installing or reloading this extension.
+
+A guest is a board member outside the board's Trello Workspace membership;
+it does not identify their employer. Cancel preserves your comment draft.
+Board and card confirmation dismissals are independent and can be restored
+in Settings. Membership updates are eventual (normally 60–90 seconds).
+
+The expiration choice applies only to newly issued tokens. Existing tokens
+keep their original expiration. Never expires means no scheduled expiration;
+tokens can still be revoked or invalidated. Revoke access in your Trello
+account settings. Each person must authorize their own token; never share it.
+
+This version was verified on deterministic Trello-like fixtures in Chromium.
+Earlier non-posting live Trello checks verified card warnings and Cancel.
+Live Post Anyway continuation and Edge acceptance remain outstanding.
+Trello supplies no documented stable pre-comment hook or DOM selectors.
+Unknown editors and unavailable membership leave native commenting usable;
+the extension cannot guarantee pre-submit warnings in those conditions.
+Validate on an authorized disposable test board before company rollout.
+
+The full source package includes README.md and docs/ with installation,
+privacy, troubleshooting, research, limitations, and the test report.
+No backend or analytics. The extension never posts via the Trello API.
+Read tokens are stored only in trusted local extension storage. Treat tokens
+as private; removing one here does not revoke it at Trello.
+
+To update, replace the files in Chrome's existing loaded folder, click Reload
+at chrome://extensions, reopen Settings, and refresh all Trello tabs.
